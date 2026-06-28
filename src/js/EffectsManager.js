@@ -4,12 +4,19 @@ export const Confetti = {
     particles: [],
     animationId: null,
     active: false,
+    resizeHandler: null,
 
     init(canvasId) {
         this.canvas = document.getElementById(canvasId);
+        if (!this.canvas) return;
         this.ctx = this.canvas.getContext('2d');
         this.resize();
-        window.addEventListener('resize', () => this.resize());
+        
+        if (this.resizeHandler) {
+            window.removeEventListener('resize', this.resizeHandler);
+        }
+        this.resizeHandler = () => this.resize();
+        window.addEventListener('resize', this.resizeHandler);
     },
 
     resize() {

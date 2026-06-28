@@ -5,8 +5,8 @@ import { AudioSynth } from './AudioManager.js';
 import { Confetti } from './EffectsManager.js';
 import * as Storage from './StorageManager.js';
 
-const game = new GameEngine();
-const ui = new UIController(game);
+let game;
+let ui;
 
 // Rate limiting utility
 function throttle(func, limit) {
@@ -21,6 +21,8 @@ function throttle(func, limit) {
 }
 
 function initApp() {
+    game = new GameEngine();
+    ui = new UIController(game);
     game.setScores(Storage.loadScores());
     ui.updateScoreboard();
 
@@ -173,6 +175,13 @@ function bindEvents() {
             }
         }
     });
+
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'ttt_premium_scores' && game && ui) {
+            game.setScores(Storage.loadScores());
+            ui.updateScoreboard();
+        }
+    });
 }
 
 function executeMove(index) {
@@ -251,4 +260,8 @@ function createRipple(event) {
     button.appendChild(circle);
 }
 
-window.addEventListener('DOMContentLoaded', initApp);
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}

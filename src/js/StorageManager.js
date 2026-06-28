@@ -6,10 +6,10 @@ const defaultScores = {
 };
 
 export function loadScores() {
-    const savedScores = localStorage.getItem(STORAGE_KEY);
-    if (!savedScores) return { pvp: { ...defaultScores.pvp }, pve: { ...defaultScores.pve } };
-    
     try {
+        const savedScores = localStorage.getItem(STORAGE_KEY);
+        if (!savedScores) return { pvp: { ...defaultScores.pvp }, pve: { ...defaultScores.pve } };
+        
         const parsed = JSON.parse(savedScores);
         if (!parsed || typeof parsed !== 'object') {
             return { pvp: { ...defaultScores.pvp }, pve: { ...defaultScores.pve } };
@@ -29,7 +29,7 @@ export function loadScores() {
             pve: sanitizeScoreGroup(parsed.pve)
         };
     } catch (e) {
-        console.error('Failed to parse saved scores:', e);
+        console.error('Failed to load or parse saved scores:', e);
         return { pvp: { ...defaultScores.pvp }, pve: { ...defaultScores.pve } };
     }
 }
@@ -43,36 +43,68 @@ export function saveScores(scores) {
 }
 
 export function loadTheme() {
-    const theme = localStorage.getItem('ttt_premium_theme');
-    return (theme === 'light' || theme === 'dark') ? theme : 'dark';
+    try {
+        const theme = localStorage.getItem('ttt_premium_theme');
+        return (theme === 'light' || theme === 'dark') ? theme : 'dark';
+    } catch (e) {
+        return 'dark';
+    }
 }
 
 export function saveTheme(theme) {
-    localStorage.setItem('ttt_premium_theme', theme);
+    try {
+        localStorage.setItem('ttt_premium_theme', theme);
+    } catch (e) {
+        console.error('Failed to save theme:', e);
+    }
 }
 
 export function loadSoundEnabled() {
-    return localStorage.getItem('ttt_premium_sound') !== 'false';
+    try {
+        return localStorage.getItem('ttt_premium_sound') !== 'false';
+    } catch (e) {
+        return true;
+    }
 }
 
 export function saveSoundEnabled(enabled) {
-    localStorage.setItem('ttt_premium_sound', enabled);
+    try {
+        localStorage.setItem('ttt_premium_sound', enabled);
+    } catch (e) {
+        console.error('Failed to save sound setting:', e);
+    }
 }
 
 export function loadGameMode() {
-    const mode = localStorage.getItem('ttt_premium_mode');
-    return (mode === 'pvp' || mode === 'pve') ? mode : 'pvp';
+    try {
+        const mode = localStorage.getItem('ttt_premium_mode');
+        return (mode === 'pvp' || mode === 'pve') ? mode : 'pvp';
+    } catch (e) {
+        return 'pvp';
+    }
 }
 
 export function saveGameMode(mode) {
-    localStorage.setItem('ttt_premium_mode', mode);
+    try {
+        localStorage.setItem('ttt_premium_mode', mode);
+    } catch (e) {
+        console.error('Failed to save game mode:', e);
+    }
 }
 
 export function loadDifficulty() {
-    const diff = localStorage.getItem('ttt_premium_difficulty');
-    return (diff === 'easy' || diff === 'medium' || diff === 'impossible') ? diff : 'impossible';
+    try {
+        const diff = localStorage.getItem('ttt_premium_difficulty');
+        return (diff === 'easy' || diff === 'medium' || diff === 'impossible') ? diff : 'impossible';
+    } catch (e) {
+        return 'impossible';
+    }
 }
 
 export function saveDifficulty(difficulty) {
-    localStorage.setItem('ttt_premium_difficulty', difficulty);
+    try {
+        localStorage.setItem('ttt_premium_difficulty', difficulty);
+    } catch (e) {
+        console.error('Failed to save difficulty:', e);
+    }
 }
