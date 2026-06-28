@@ -8,6 +8,18 @@ import * as Storage from './StorageManager.js';
 const game = new GameEngine();
 const ui = new UIController(game);
 
+// Rate limiting utility
+function throttle(func, limit) {
+    let inThrottle;
+    return function(...args) {
+        if (!inThrottle) {
+            func.apply(this, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    }
+}
+
 function initApp() {
     game.setScores(Storage.loadScores());
     ui.updateScoreboard();
@@ -69,26 +81,26 @@ function bindEvents() {
         });
     });
 
-    document.getElementById('reset-board-btn').addEventListener('click', (e) => {
+    document.getElementById('reset-board-btn').addEventListener('click', throttle((e) => {
         createRipple(e);
         resetRound(false);
-    });
+    }, 400));
 
-    document.getElementById('reset-scores-btn').addEventListener('click', (e) => {
+    document.getElementById('reset-scores-btn').addEventListener('click', throttle((e) => {
         createRipple(e);
         game.resetScores();
         Storage.saveScores(game.scores);
         ui.updateScoreboard();
         AudioSynth.play('reset');
-    });
+    }, 400));
 
-    document.getElementById('modal-play-again-btn').addEventListener('click', (e) => {
+    document.getElementById('modal-play-again-btn').addEventListener('click', throttle((e) => {
         createRipple(e);
         resetRound(false);
-    });
+    }, 400));
 
     ui.modeButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', throttle(() => {
             const selectedMode = btn.getAttribute('data-mode');
             if (selectedMode === game.gameMode) return;
             
@@ -96,7 +108,7 @@ function bindEvents() {
             ui.setGameModeUI(selectedMode);
             resetRound(true);
             ui.updateScoreboard();
-        });
+        }, 400));
     });
 
     document.getElementById('difficulty-select').addEventListener('change', (e) => {
