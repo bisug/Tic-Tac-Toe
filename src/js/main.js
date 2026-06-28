@@ -32,6 +32,15 @@ function initApp() {
     AudioSynth.enabled = soundEnabled;
     ui.updateSoundIcons(soundEnabled);
 
+    let mode = Storage.loadGameMode();
+    game.gameMode = mode;
+    ui.setGameModeUI(mode);
+
+    let difficulty = Storage.loadDifficulty();
+    game.difficulty = difficulty;
+    const diffSelect = document.getElementById('difficulty-select');
+    if (diffSelect) diffSelect.value = difficulty;
+
     Confetti.init('confetti-canvas');
     bindEvents();
     ui.updateStatusBubble();
@@ -105,6 +114,7 @@ function bindEvents() {
             if (selectedMode === game.gameMode) return;
             
             game.gameMode = selectedMode;
+            Storage.saveGameMode(selectedMode);
             ui.setGameModeUI(selectedMode);
             resetRound(true);
             ui.updateScoreboard();
@@ -113,7 +123,7 @@ function bindEvents() {
 
     document.getElementById('difficulty-select').addEventListener('change', (e) => {
         game.difficulty = e.target.value;
-        resetRound(true);
+        Storage.saveDifficulty(e.target.value);
     });
 
     ui.themeBtn.addEventListener('click', () => {
@@ -138,10 +148,35 @@ function bindEvents() {
     document.querySelectorAll('.ripple').forEach(btn => {
         btn.addEventListener('click', createRipple);
     });
+
+    document.addEventListener('keydown', (e) => {
+        if (!ui.resultModal.classList.contains('hidden')) {
+            if (e.key === 'Escape') {
+                resetRound(false);
+            } else if (e.key === 'Tab') {
+                const focusable = ui.resultModal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                if (focusable.length > 0) {
+                    const first = focusable[0];
+                    const last = focusable[focusable.length - 1];
+                    if (e.shiftKey) {
+                        if (document.activeElement === first) {
+                            last.focus();
+                            e.preventDefault();
+                        }
+                    } else {
+                        if (document.activeElement === last) {
+                            first.focus();
+                            e.preventDefault();
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
 function executeMove(index) {
-    if (game.boardState[index] !== '' || !game.gameActive) return;
+    if (index < 0 || index > 8 || game.boardState[index] !== '' || !game.gameActive) return;
 
     game.boardState[index] = game.currentPlayer;
     ui.markCell(index, game.currentPlayer);

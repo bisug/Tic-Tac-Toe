@@ -1,10 +1,11 @@
 export function getAIMove(boardState, difficulty, evaluateBoardFn) {
+    const boardCopy = [...boardState];
     if (difficulty === 'easy') {
-        return findRandomMove(boardState);
+        return findRandomMove(boardCopy);
     } else if (difficulty === 'medium') {
-        return findMediumMove(boardState, evaluateBoardFn);
+        return findMediumMove(boardCopy, evaluateBoardFn);
     } else {
-        return findBestMove(boardState, evaluateBoardFn);
+        return findBestMove(boardCopy, evaluateBoardFn);
     }
 }
 

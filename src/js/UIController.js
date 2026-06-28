@@ -118,7 +118,7 @@ export class UIController {
             this.winningLine.setAttribute('y1', lineInfo.y1);
             this.winningLine.setAttribute('x2', lineInfo.x2);
             this.winningLine.setAttribute('y2', lineInfo.y2);
-            this.winningLineSvg.className = `winning-line-svg active win-${winner.toLowerCase()}`;
+            this.winningLineSvg.setAttribute('class', `winning-line-svg active win-${winner.toLowerCase()}`);
         }
 
         this.updateScoreboard();
@@ -135,6 +135,8 @@ export class UIController {
             this.modalTitle.style.color = winner === 'X' ? 'var(--accent-x)' : 'var(--accent-o)';
             this.modalMessage.innerText = this.game.gameMode === 'pve' ? (winner === 'X' ? 'You outsmarted the AI!' : 'The AI bested you this time.') : 'A glorious victory!';
             this.resultModal.classList.remove('hidden');
+            const playAgainBtn = document.getElementById('modal-play-again-btn');
+            if (playAgainBtn) playAgainBtn.focus();
         }, 1500);
     }
 
@@ -153,6 +155,8 @@ export class UIController {
             this.modalTitle.style.color = 'var(--tie-color)';
             this.modalMessage.innerText = 'A well-fought battle ending in a stalemate.';
             this.resultModal.classList.remove('hidden');
+            const playAgainBtn = document.getElementById('modal-play-again-btn');
+            if (playAgainBtn) playAgainBtn.focus();
         }, 1000);
     }
 
@@ -168,13 +172,16 @@ export class UIController {
             cell.setAttribute('aria-label', `Cell ${idx + 1}, Empty`);
         });
 
-        this.winningLineSvg.className = 'winning-line-svg';
+        this.winningLineSvg.setAttribute('class', 'winning-line-svg');
         this.winningLine.setAttribute('x1', 0);
         this.winningLine.setAttribute('y1', 0);
         this.winningLine.setAttribute('x2', 0);
         this.winningLine.setAttribute('y2', 0);
 
         this.resultModal.classList.add('hidden');
+        const resetBtn = document.getElementById('reset-board-btn');
+        if (resetBtn) resetBtn.focus();
+        
         Confetti.stop();
         this.updateStatusBubble();
     }
@@ -207,8 +214,11 @@ export class UIController {
     }
 
     setGameModeUI(mode) {
-        this.modeButtons.forEach(b => b.classList.remove('active'));
-        document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+        this.modeButtons.forEach(b => {
+            const isActive = b.getAttribute('data-mode') === mode;
+            b.classList.toggle('active', isActive);
+            b.setAttribute('aria-checked', isActive ? 'true' : 'false');
+        });
         
         if (mode === 'pve') {
             this.difficultyWrapper.classList.remove('hidden');

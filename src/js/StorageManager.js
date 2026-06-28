@@ -11,9 +11,22 @@ export function loadScores() {
     
     try {
         const parsed = JSON.parse(savedScores);
+        if (!parsed || typeof parsed !== 'object') {
+            return { pvp: { ...defaultScores.pvp }, pve: { ...defaultScores.pve } };
+        }
+        
+        const sanitizeScoreGroup = (group) => {
+            const sanitized = {};
+            const source = group || {};
+            sanitized.x = Number.isInteger(source.x) && source.x >= 0 ? source.x : 0;
+            sanitized.o = Number.isInteger(source.o) && source.o >= 0 ? source.o : 0;
+            sanitized.ties = Number.isInteger(source.ties) && source.ties >= 0 ? source.ties : 0;
+            return sanitized;
+        };
+
         return {
-            pvp: { ...defaultScores.pvp, ...(parsed.pvp || {}) },
-            pve: { ...defaultScores.pve, ...(parsed.pve || {}) }
+            pvp: sanitizeScoreGroup(parsed.pvp),
+            pve: sanitizeScoreGroup(parsed.pve)
         };
     } catch (e) {
         console.error('Failed to parse saved scores:', e);
@@ -30,7 +43,8 @@ export function saveScores(scores) {
 }
 
 export function loadTheme() {
-    return localStorage.getItem('ttt_premium_theme') || 'dark';
+    const theme = localStorage.getItem('ttt_premium_theme');
+    return (theme === 'light' || theme === 'dark') ? theme : 'dark';
 }
 
 export function saveTheme(theme) {
@@ -43,4 +57,22 @@ export function loadSoundEnabled() {
 
 export function saveSoundEnabled(enabled) {
     localStorage.setItem('ttt_premium_sound', enabled);
+}
+
+export function loadGameMode() {
+    const mode = localStorage.getItem('ttt_premium_mode');
+    return (mode === 'pvp' || mode === 'pve') ? mode : 'pvp';
+}
+
+export function saveGameMode(mode) {
+    localStorage.setItem('ttt_premium_mode', mode);
+}
+
+export function loadDifficulty() {
+    const diff = localStorage.getItem('ttt_premium_difficulty');
+    return (diff === 'easy' || diff === 'medium' || diff === 'impossible') ? diff : 'impossible';
+}
+
+export function saveDifficulty(difficulty) {
+    localStorage.setItem('ttt_premium_difficulty', difficulty);
 }

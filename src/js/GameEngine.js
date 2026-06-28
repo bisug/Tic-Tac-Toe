@@ -31,12 +31,8 @@ export class GameEngine {
     }
     
     evaluateBoard(board) {
-        for (let combo of this.WIN_COMBOS) {
-            if (board[combo[0]] && board[combo[0]] === board[combo[1]] && board[combo[0]] === board[combo[2]]) {
-                return board[combo[0]];
-            }
-        }
-        return null;
+        const win = this.checkWin(board);
+        return win ? win.winner : null;
     }
 
     isBoardFull(board = this.boardState) {

@@ -454,10 +454,6 @@ body {
     aspect-ratio: 1 / 1;
     min-width: 2.75rem;
     min-height: 2.75rem;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
     background: var(--bg-neumorphic);
     border: none;
     border-radius: var(--border-radius-md);
