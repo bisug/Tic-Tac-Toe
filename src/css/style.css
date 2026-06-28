@@ -69,13 +69,13 @@
 body {
     background: var(--bg-neumorphic);
     color: var(--text-primary);
-    height: 100dvh;
+    min-height: 100dvh;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
     position: relative;
-    padding: clamp(8px, 2vh, 1rem);
+    padding: clamp(16px, 3vh, 1.5rem) clamp(8px, 2vh, 1rem);
     transition: background var(--transition-slow), color var(--transition-slow);
 }
 
@@ -106,10 +106,10 @@ body {
 .app-container {
     display: flex;
     flex-direction: column;
-    gap: clamp(0.5rem, 2vh, 1.5rem);
+    gap: clamp(0.75rem, 2.5vh, 1.5rem);
     z-index: 10;
-    height: 100%;
-    max-height: 100%;
+    margin: auto;
+    width: 100%;
     justify-content: center;
     animation: appEntrance 0.8s var(--transition-slow) forwards;
 }
@@ -267,6 +267,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
     animation: slideDown 0.3s ease-out forwards;
 }
 
@@ -290,6 +292,8 @@ body {
 .custom-select-container {
     position: relative;
     width: 60%;
+    flex: 1 1 auto;
+    min-width: 140px;
 }
 
 .custom-select-container select {
@@ -328,7 +332,7 @@ body {
 /* Scoreboard */
 .scoreboard {
     display: flex;
-    gap: 1rem;
+    gap: clamp(0.5rem, 2vw, 1rem);
 }
 
 .score-box {
@@ -479,7 +483,7 @@ body {
 
 /* Pressed State */
 .cell.marked {
-    cursor: default;
+    cursor: not-allowed;
     box-shadow: inset 5px 5px 0.625rem var(--shadow-dark), inset -5px -5px 0.625rem var(--shadow-light);
 }
 
@@ -604,13 +608,25 @@ body {
     }
 }
 
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+.shake-animation {
+    animation: shake 0.3s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
 /* Neumorphic Buttons */
 .action-buttons {
     display: flex;
-    gap: 1rem;
+    gap: clamp(0.5rem, 2vw, 1rem);
+    flex-wrap: wrap;
 }
 
 .primary-btn, .secondary-btn {
+    flex: 1 1 120px;
     font-family: inherit;
     font-weight: 700;
     font-size: clamp(0.9rem, 3.5vw, 1rem);
@@ -659,6 +675,32 @@ body {
 .secondary-btn:active {
     transform: translateY(0);
     box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+}
+
+/* Ripple Effect */
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple .ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    background: rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+}
+
+[data-theme="light"] .ripple .ripple-effect {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
 }
 
 /* Announcement Modal */

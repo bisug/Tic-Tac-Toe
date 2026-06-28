@@ -47,6 +47,7 @@ export class UIController {
         this.themeBtn = document.getElementById('theme-btn');
         this.soundBtn = document.getElementById('sound-btn');
         this.modeButtons = document.querySelectorAll('.mode-btn');
+        this.modalTimeoutId = null;
     }
 
     updateScoreboard() {
@@ -127,7 +128,8 @@ export class UIController {
         AudioSynth.play('win');
         Confetti.start();
 
-        setTimeout(() => {
+        if (this.modalTimeoutId) clearTimeout(this.modalTimeoutId);
+        this.modalTimeoutId = setTimeout(() => {
             this.modalIconWrapper.innerHTML = winner === 'X' ? svgX : svgO;
             this.modalTitle.innerText = winner === 'X' ? (this.game.gameMode === 'pve' ? 'You Win!' : 'Player X Wins!') : (this.game.gameMode === 'pve' ? 'AI Wins!' : 'Player O Wins!');
             this.modalTitle.style.color = winner === 'X' ? 'var(--accent-x)' : 'var(--accent-o)';
@@ -144,7 +146,8 @@ export class UIController {
 
         AudioSynth.play('draw');
 
-        setTimeout(() => {
+        if (this.modalTimeoutId) clearTimeout(this.modalTimeoutId);
+        this.modalTimeoutId = setTimeout(() => {
             this.modalIconWrapper.innerHTML = `<span style="font-size: 2.5rem; font-weight: 800; color: var(--tie-color)">-</span>`;
             this.modalTitle.innerText = "It's a Tie!";
             this.modalTitle.style.color = 'var(--tie-color)';
@@ -154,6 +157,11 @@ export class UIController {
     }
 
     resetBoardUI() {
+        if (this.modalTimeoutId) {
+            clearTimeout(this.modalTimeoutId);
+            this.modalTimeoutId = null;
+        }
+
         this.cells.forEach((cell, idx) => {
             cell.classList.remove('marked', 'winning-cell', 'win-x', 'win-o');
             cell.innerHTML = '';

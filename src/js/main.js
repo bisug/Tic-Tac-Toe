@@ -56,7 +56,13 @@ function bindEvents() {
 
         cell.addEventListener('click', () => {
             AudioSynth.init();
-            if (game.boardState[index] !== '' || !game.gameActive) return;
+            if (game.boardState[index] !== '' || !game.gameActive) {
+                if (game.boardState[index] !== '') {
+                    cell.classList.add('shake-animation');
+                    setTimeout(() => cell.classList.remove('shake-animation'), 300);
+                }
+                return;
+            }
             if (game.gameMode === 'pve' && game.currentPlayer === 'O') return;
             
             executeMove(index);
