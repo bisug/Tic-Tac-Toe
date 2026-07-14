@@ -71,14 +71,20 @@ button, select {
     --tie-muted: rgba(221, 107, 32, 0.08);
 }
 
+html {
+    height: 100%;
+}
+
 body {
     background: var(--bg-neumorphic);
     color: var(--text-primary);
     min-height: 100dvh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: auto;
+    scrollbar-gutter: stable;
     position: relative;
     padding: clamp(16px, 3vh, 1.5rem) clamp(8px, 2vh, 1rem);
     transition: background var(--transition-slow), color var(--transition-slow);
@@ -115,7 +121,9 @@ body {
     z-index: 10;
     margin: auto;
     width: 100%;
-    justify-content: center;
+    flex: 1 1 auto;
+    min-height: 0;
+    justify-content: flex-start;
     animation: appEntrance 0.8s var(--transition-slow) forwards;
 }
 
@@ -125,6 +133,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0 4px;
+    flex: 0 0 auto;
 }
 
 .logo-area {
@@ -218,6 +227,7 @@ body {
     flex-direction: column;
     gap: clamp(0.75rem, 2vh, 1.5rem);
     transition: all var(--transition-slow);
+    flex: 1 1 auto;
     flex-shrink: 1;
     min-height: 0;
 }
@@ -459,12 +469,18 @@ body {
 }
 
 /* Board layout */
+/* The board claims the leftover vertical space (flex: 1) so the whole card
+   always fits the viewport; aspect-ratio keeps it square, capped at 25rem. */
 .board-wrapper {
     position: relative;
-    width: 100%;
-    max-width: clamp(200px, 45vh, 400px);
+    flex: 1 1 auto;
+    min-height: 0;
     margin: 0 auto;
     aspect-ratio: 1 / 1;
+    width: auto;
+    max-width: min(100%, 25rem);
+    max-height: 25rem;
+    align-self: center;
 }
 
 .board {
@@ -842,6 +858,7 @@ body {
     font-size: clamp(0.65rem, 2.5vw, 0.75rem);
     color: var(--text-muted);
     padding: 0.625rem 0;
+    flex: 0 0 auto;
     text-shadow: 1px 1px 0px var(--shadow-light);
 }
 
