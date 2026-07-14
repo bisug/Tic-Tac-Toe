@@ -2,7 +2,6 @@ import { GameEngine } from './GameEngine.js';
 import { UIController } from './UIController.js';
 import { getAIMove } from './AIEngine.js';
 import { AudioSynth } from './AudioManager.js';
-import { Confetti } from './EffectsManager.js';
 import * as Storage from './StorageManager.js';
 
 let game;
@@ -43,7 +42,6 @@ function initApp() {
     const diffSelect = document.getElementById('difficulty-select');
     if (diffSelect) diffSelect.value = difficulty;
 
-    Confetti.init('confetti-canvas');
     bindEvents();
     ui.updateStatusBubble();
 }

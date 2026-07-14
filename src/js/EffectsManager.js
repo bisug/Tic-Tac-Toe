@@ -30,6 +30,10 @@ export const Confetti = {
         if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             return;
         }
+        // Allocate the full-screen canvas lazily, only when a win occurs,
+        // so we don't hold a large backing store in memory during normal play.
+        if (!this.canvas) this.init('confetti-canvas');
+        if (!this.canvas) return;
         this.active = true;
         this.particles = [];
         this.resize();
