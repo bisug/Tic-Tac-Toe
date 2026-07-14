@@ -27,6 +27,9 @@ export const Confetti = {
     },
 
     start() {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            return;
+        }
         this.active = true;
         this.particles = [];
         this.resize();

@@ -52,9 +52,9 @@ export class UIController {
 
     updateScoreboard() {
         const currentScores = this.game.scores[this.game.gameMode];
-        this.scoreXEl.innerText = currentScores.x;
-        this.scoreOEl.innerText = currentScores.o;
-        this.scoreTiesEl.innerText = currentScores.ties;
+        this.scoreXEl.textContent = currentScores.x;
+        this.scoreOEl.textContent = currentScores.o;
+        this.scoreTiesEl.textContent = currentScores.ties;
     }
 
     animateScorePop(winner) {
@@ -73,7 +73,7 @@ export class UIController {
         
         if (this.game.isAITyping) {
             this.statusBubble.classList.add('o-turn');
-            this.statusText.innerText = 'AI is thinking...';
+            this.statusText.textContent = 'AI is thinking...';
             return;
         }
 
@@ -81,26 +81,26 @@ export class UIController {
         if (winResult) {
             if (winResult.winner === 'X') {
                 this.statusBubble.classList.add('win-x');
-                this.statusText.innerText = this.game.gameMode === 'pve' ? 'You Win! 🎉' : 'Player X Wins! 🎉';
+                this.statusText.textContent = this.game.gameMode === 'pve' ? 'You Win! 🎉' : 'Player X Wins! 🎉';
             } else {
                 this.statusBubble.classList.add('win-o');
-                this.statusText.innerText = this.game.gameMode === 'pve' ? 'AI Wins! 🤖' : 'Player O Wins! 🎉';
+                this.statusText.textContent = this.game.gameMode === 'pve' ? 'AI Wins! 🤖' : 'Player O Wins! 🎉';
             }
             return;
         }
 
         if (this.game.isBoardFull()) {
             this.statusBubble.classList.add('draw');
-            this.statusText.innerText = "It's a Tie! 🤝";
+            this.statusText.textContent = "It's a Tie! 🤝";
             return;
         }
 
         if (this.game.currentPlayer === 'X') {
             this.statusBubble.classList.add('x-turn');
-            this.statusText.innerText = this.game.gameMode === 'pve' ? 'Your Turn' : "Player X's Turn";
+            this.statusText.textContent = this.game.gameMode === 'pve' ? 'Your Turn' : "Player X's Turn";
         } else {
             this.statusBubble.classList.add('o-turn');
-            this.statusText.innerText = this.game.gameMode === 'pve' ? "AI's Turn" : "Player O's Turn";
+            this.statusText.textContent = this.game.gameMode === 'pve' ? "AI's Turn" : "Player O's Turn";
         }
     }
 
@@ -131,10 +131,10 @@ export class UIController {
         if (this.modalTimeoutId) clearTimeout(this.modalTimeoutId);
         this.modalTimeoutId = setTimeout(() => {
             this.modalIconWrapper.innerHTML = winner === 'X' ? svgX : svgO;
-            this.modalTitle.innerText = winner === 'X' ? (this.game.gameMode === 'pve' ? 'You Win!' : 'Player X Wins!') : (this.game.gameMode === 'pve' ? 'AI Wins!' : 'Player O Wins!');
+            this.modalTitle.textContent = winner === 'X' ? (this.game.gameMode === 'pve' ? 'You Win!' : 'Player X Wins!') : (this.game.gameMode === 'pve' ? 'AI Wins!' : 'Player O Wins!');
             this.modalTitle.style.color = winner === 'X' ? 'var(--accent-x)' : 'var(--accent-o)';
-            this.modalMessage.innerText = this.game.gameMode === 'pve' ? (winner === 'X' ? 'You outsmarted the AI!' : 'The AI bested you this time.') : 'A glorious victory!';
-            this.resultModal.classList.remove('hidden');
+            this.modalMessage.textContent = this.game.gameMode === 'pve' ? (winner === 'X' ? 'You outsmarted the AI!' : 'The AI bested you this time.') : 'A glorious victory!';
+            this.resultModal.classList.add('is-open');
             const playAgainBtn = document.getElementById('modal-play-again-btn');
             if (playAgainBtn) playAgainBtn.focus();
         }, 1500);
@@ -151,20 +151,24 @@ export class UIController {
         if (this.modalTimeoutId) clearTimeout(this.modalTimeoutId);
         this.modalTimeoutId = setTimeout(() => {
             this.modalIconWrapper.innerHTML = `<span style="font-size: 2.5rem; font-weight: 800; color: var(--tie-color)">-</span>`;
-            this.modalTitle.innerText = "It's a Tie!";
+            this.modalTitle.textContent = "It's a Tie!";
             this.modalTitle.style.color = 'var(--tie-color)';
-            this.modalMessage.innerText = 'A well-fought battle ending in a stalemate.';
-            this.resultModal.classList.remove('hidden');
+            this.modalMessage.textContent = 'A well-fought battle ending in a stalemate.';
+            this.resultModal.classList.add('is-open');
             const playAgainBtn = document.getElementById('modal-play-again-btn');
             if (playAgainBtn) playAgainBtn.focus();
         }, 1000);
     }
 
-    resetBoardUI() {
+    clearModalTimeout() {
         if (this.modalTimeoutId) {
             clearTimeout(this.modalTimeoutId);
             this.modalTimeoutId = null;
         }
+    }
+
+    resetBoardUI() {
+        this.clearModalTimeout();
 
         this.cells.forEach((cell, idx) => {
             cell.classList.remove('marked', 'winning-cell', 'win-x', 'win-o');
@@ -178,7 +182,7 @@ export class UIController {
         this.winningLine.setAttribute('x2', 0);
         this.winningLine.setAttribute('y2', 0);
 
-        this.resultModal.classList.add('hidden');
+        this.resultModal.classList.remove('is-open');
         const resetBtn = document.getElementById('reset-board-btn');
         if (resetBtn) resetBtn.focus();
         
@@ -222,12 +226,12 @@ export class UIController {
         
         if (mode === 'pve') {
             this.difficultyWrapper.classList.remove('hidden');
-            this.playerXName.innerText = 'Player';
-            this.playerOName.innerText = 'Computer';
+            this.playerXName.textContent = 'Player';
+            this.playerOName.textContent = 'Computer';
         } else {
             this.difficultyWrapper.classList.add('hidden');
-            this.playerXName.innerText = 'Player 1';
-            this.playerOName.innerText = 'Player 2';
+            this.playerXName.textContent = 'Player 1';
+            this.playerOName.textContent = 'Player 2';
         }
     }
 }

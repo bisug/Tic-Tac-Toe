@@ -102,6 +102,7 @@ function bindEvents() {
         game.resetScores();
         Storage.saveScores(game.scores);
         ui.updateScoreboard();
+        ui.clearModalTimeout();
         AudioSynth.play('reset');
     }, 400));
 
@@ -147,32 +148,34 @@ function bindEvents() {
         }
     });
 
-    document.querySelectorAll('.ripple').forEach(btn => {
-        btn.addEventListener('click', createRipple);
-    });
-
     document.addEventListener('keydown', (e) => {
-        if (!ui.resultModal.classList.contains('hidden')) {
-            if (e.key === 'Escape') {
-                resetRound(false);
-            } else if (e.key === 'Tab') {
-                const focusable = ui.resultModal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-                if (focusable.length > 0) {
-                    const first = focusable[0];
-                    const last = focusable[focusable.length - 1];
-                    if (e.shiftKey) {
-                        if (document.activeElement === first) {
-                            last.focus();
-                            e.preventDefault();
-                        }
-                    } else {
-                        if (document.activeElement === last) {
-                            first.focus();
-                            e.preventDefault();
-                        }
+        if (!ui.resultModal.classList.contains('is-open')) return;
+
+        if (e.key === 'Escape') {
+            ui.resultModal.classList.remove('is-open');
+        } else if (e.key === 'Tab') {
+            const focusable = ui.resultModal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            if (focusable.length > 0) {
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                if (e.shiftKey) {
+                    if (document.activeElement === first) {
+                        last.focus();
+                        e.preventDefault();
+                    }
+                } else {
+                    if (document.activeElement === last) {
+                        first.focus();
+                        e.preventDefault();
                     }
                 }
             }
+        }
+    });
+
+    ui.resultModal.addEventListener('click', (e) => {
+        if (e.target === ui.resultModal) {
+            ui.resultModal.classList.remove('is-open');
         }
     });
 

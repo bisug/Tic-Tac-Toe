@@ -1,0 +1,16 @@
+{
+  "name": "tic-tac-toe",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Modern, responsive Tic-Tac-Toe with a minimax AI.",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dev": "npx --yes serve ."
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1",
+    "vitest": "^3.0.0"
+  }
+}

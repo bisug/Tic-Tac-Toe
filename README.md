@@ -20,7 +20,7 @@ This project was created as a coding challenge against [@rajbanshianish677-bit](
   - ◐ **Medium (Adaptive):** A balanced challenge.
   - ● **Impossible (Minimax):** The AI plays flawlessly—can you beat it?
 - **Modern UI/UX:**
-  - Sleek design with a glassmorphism feel.
+  - Sleek **neumorphic** design with soft extruded shadows.
   - **Light & Dark Theme** support with a smooth toggle.
 - **Interactive Experience:**
   - Sound effects for moves, wins, and draws (with a toggle switch).
@@ -36,6 +36,8 @@ This project was created as a coding challenge against [@rajbanshianish677-bit](
 
 ## ❯ How to Run Locally
 
+The game uses native ES modules, so it must be served over **HTTP** (opening `index.html` directly via `file://` will not work because browsers block module loading from the file system).
+
 1. **Clone the repository**
    ```bash
    git clone https://github.com/bisug/Tic-Tac-Toe.git
@@ -46,8 +48,12 @@ This project was created as a coding challenge against [@rajbanshianish677-bit](
    cd Tic-Tac-Toe
    ```
 
-3. **Open the project**
-   Simply open the `index.html` file in your preferred web browser, or use a local server like Live Server in VS Code.
+3. **Serve it** — pick any one of these:
+   - With Node (no install needed): `npx serve .`  *(or `npm run dev` after `npm install`)*
+   - With Python 3: `python -m http.server 8000` then open `http://localhost:8000`
+   - Or use the **Live Server** extension in VS Code (right-click `index.html` → "Open with Live Server").
+
+4. **Run the tests** (requires Node): `npm install` then `npm test`.
 
 ## ⚑ The Challenge
 

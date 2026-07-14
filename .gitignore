@@ -29,6 +29,3 @@ dist-ssr/
 
 # Agent/System Generated
 .gemini/
-
-# Tests
-tests/
