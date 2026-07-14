@@ -25,8 +25,12 @@ const statusText = () => document.querySelector('.status-text').textContent;
 
 // Click "New Round" and flush timers so the 400ms click-throttle is cleared
 // and any pending modal timeout is cancelled. Safe to call repeatedly.
+// Forces a clean PvP round with X to move (toggling pve->pvp triggers a
+// forceX reset), so scenario tests start from a known state.
 function newRound() {
-    document.getElementById('reset-board-btn').click();
+    document.getElementById('mode-pve').click();
+    vi.advanceTimersByTime(450);
+    document.getElementById('mode-pvp').click();
     vi.advanceTimersByTime(450);
 }
 
@@ -53,6 +57,28 @@ describe('App integration', () => {
     it('boots in PvP with X to move', () => {
         expect(cells().length).toBe(9);
         expect(statusText()).toMatch(/Player X/);
+    });
+
+    it('highlights the active player on the scoreboard', () => {
+        newRound();
+        const xBox = () => document.getElementById('score-x').closest('.score-box');
+        const oBox = () => document.getElementById('score-o').closest('.score-box');
+
+        expect(xBox().classList.contains('turn-x')).toBe(true);
+        expect(oBox().classList.contains('turn-o')).toBe(false);
+
+        cells()[0].click(); // X moves -> O's turn
+        expect(xBox().classList.contains('turn-x')).toBe(false);
+        expect(oBox().classList.contains('turn-o')).toBe(true);
+    });
+
+    it('supports arrow-key navigation across the board', () => {
+        cells()[0].focus();
+        expect(document.activeElement).toBe(cells()[0]);
+        cells()[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+        expect(document.activeElement).toBe(cells()[1]);
+        cells()[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+        expect(document.activeElement).toBe(cells()[4]);
     });
 
     it('plays a full PvP round and declares X the winner', () => {

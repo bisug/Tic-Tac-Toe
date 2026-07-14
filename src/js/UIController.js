@@ -70,10 +70,11 @@ export class UIController {
 
     updateStatusBubble() {
         this.statusBubble.className = 'status-bubble';
-        
+
         if (this.game.isAITyping) {
-            this.statusBubble.classList.add('o-turn');
-            this.statusText.textContent = 'AI is thinking...';
+            this.statusBubble.classList.add('o-turn', 'thinking');
+            this.statusText.textContent = 'AI is thinking';
+            this.setActiveScore('O');
             return;
         }
 
@@ -86,22 +87,33 @@ export class UIController {
                 this.statusBubble.classList.add('win-o');
                 this.statusText.textContent = this.game.gameMode === 'pve' ? 'AI Wins! 🤖' : 'Player O Wins! 🎉';
             }
+            this.setActiveScore(null);
             return;
         }
 
         if (this.game.isBoardFull()) {
             this.statusBubble.classList.add('draw');
             this.statusText.textContent = "It's a Tie! 🤝";
+            this.setActiveScore(null);
             return;
         }
 
-        if (this.game.currentPlayer === 'X') {
+        const player = this.game.currentPlayer;
+        if (player === 'X') {
             this.statusBubble.classList.add('x-turn');
             this.statusText.textContent = this.game.gameMode === 'pve' ? 'Your Turn' : "Player X's Turn";
         } else {
             this.statusBubble.classList.add('o-turn');
             this.statusText.textContent = this.game.gameMode === 'pve' ? "AI's Turn" : "Player O's Turn";
         }
+        this.setActiveScore(player);
+    }
+
+    setActiveScore(player) {
+        const xBox = this.scoreXEl.closest('.score-box');
+        const oBox = this.scoreOEl.closest('.score-box');
+        if (xBox) xBox.classList.toggle('turn-x', player === 'X');
+        if (oBox) oBox.classList.toggle('turn-o', player === 'O');
     }
 
     handleWin(winResult) {

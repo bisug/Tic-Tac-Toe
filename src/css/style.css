@@ -387,6 +387,15 @@ body {
     transform: scale(1.35);
 }
 
+/* Active-player indicator: the score box of whoever is to move glows */
+.score-box.turn-x {
+    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light), 0 0 0 2px var(--accent-x);
+}
+
+.score-box.turn-o {
+    box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light), 0 0 0 2px var(--accent-o);
+}
+
 /* Status Indicator Pill */
 .status-container {
     display: flex;
@@ -429,6 +438,24 @@ body {
     color: var(--bg-neumorphic);
     background: var(--tie-color);
     box-shadow: 0 0 15px var(--tie-glow);
+}
+
+/* Animated ellipsis while the AI "thinks" (degrades gracefully if
+   animating `content` is unsupported — the base text still shows). */
+.status-bubble.thinking::after {
+    content: '';
+    display: inline-block;
+    min-width: 1.2em;
+    text-align: left;
+    animation: thinkingDots 1.4s steps(1, end) infinite;
+}
+
+@keyframes thinkingDots {
+    0%   { content: ''; }
+    25%  { content: '.'; }
+    50%  { content: '..'; }
+    75%  { content: '...'; }
+    100% { content: ''; }
 }
 
 /* Board layout */

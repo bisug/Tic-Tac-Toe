@@ -97,6 +97,25 @@ function bindEvents() {
         resetRound(false);
     }, 400));
 
+    // Roving arrow-key navigation across the 3x3 grid (Enter/Space already
+    // trigger a cell's native click to place a mark).
+    document.getElementById('board').addEventListener('keydown', (e) => {
+        if (!e.key.startsWith('Arrow')) return;
+        const cell = e.target.closest('.cell');
+        if (!cell) return;
+
+        const idx = parseInt(cell.getAttribute('data-index'), 10);
+        let next = idx;
+        if (e.key === 'ArrowRight') next = idx + 1;
+        else if (e.key === 'ArrowLeft') next = idx - 1;
+        else if (e.key === 'ArrowUp') next = idx - 3;
+        else if (e.key === 'ArrowDown') next = idx + 3;
+
+        if (next < 0 || next > 8) return;
+        e.preventDefault();
+        ui.cells[next].focus();
+    });
+
     document.getElementById('reset-scores-btn').addEventListener('click', throttle((e) => {
         createRipple(e);
         game.resetScores();
