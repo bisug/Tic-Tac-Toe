@@ -1,13 +1,16 @@
 export function getAIMove(boardState, difficulty, evaluateBoardFn) {
-    const boardCopy = [...boardState];
+    const board = [...boardState];
     if (difficulty === 'easy') {
-        return findRandomMove(boardCopy);
+        return findRandomMove(board);
     } else if (difficulty === 'medium') {
-        return findMediumMove(boardCopy, evaluateBoardFn);
-    } else {
-        return findBestMove(boardCopy, evaluateBoardFn);
+        return findMediumMove(board, evaluateBoardFn);
     }
+    return findBestMove(board, evaluateBoardFn);
 }
+
+// Center first, then corners, then edges. Trying strong squares early
+// produces far more alpha-beta cutoffs, so the search prunes harder.
+const MOVE_ORDER = [4, 0, 2, 6, 8, 1, 3, 5, 7];
 
 function findRandomMove(board) {
     const available = [];
@@ -18,39 +21,35 @@ function findRandomMove(board) {
     return available[Math.floor(Math.random() * available.length)];
 }
 
-function findMediumMove(board, evaluateBoardFn) {
-    // Heuristic 1: If AI ('O') can win in this move, take it
+// Return the index that completes a line for `player`, or -1.
+function findWinningMove(board, player, evaluateBoardFn) {
     for (let i = 0; i < 9; i++) {
-        if (board[i] === '') {
-            board[i] = 'O';
-            if (evaluateBoardFn(board) === 'O') {
-                board[i] = '';
-                return i;
-            }
-            board[i] = '';
-        }
+        if (board[i] !== '') continue;
+        board[i] = player;
+        const win = evaluateBoardFn(board) === player;
+        board[i] = '';
+        if (win) return i;
     }
-    
-    // Heuristic 2: If Player ('X') can win in their next turn, block them
-    for (let i = 0; i < 9; i++) {
-        if (board[i] === '') {
-            board[i] = 'X';
-            if (evaluateBoardFn(board) === 'X') {
-                board[i] = '';
-                return i;
-            }
-            board[i] = '';
-        }
-    }
-
-    if (Math.random() < 0.5) {
-        return findBestMove(board, evaluateBoardFn);
-    } else {
-        return findRandomMove(board);
-    }
+    return -1;
 }
 
-// Alpha-beta pruning minimax
+// Win immediately if possible, otherwise block the opponent's immediate win.
+function findImmediateResponse(board, evaluateBoardFn) {
+    const win = findWinningMove(board, 'O', evaluateBoardFn);
+    if (win !== -1) return win;
+    return findWinningMove(board, 'X', evaluateBoardFn);
+}
+
+function findMediumMove(board, evaluateBoardFn) {
+    const immediate = findImmediateResponse(board, evaluateBoardFn);
+    if (immediate !== -1) return immediate;
+    // Mix optimal play with random moves for a balanced challenge.
+    return Math.random() < 0.5
+        ? findBestMove(board, evaluateBoardFn)
+        : findRandomMove(board);
+}
+
+// Alpha-beta pruning minimax.
 function minimax(board, depth, alpha, beta, isMaximizing, evaluateBoardFn) {
     const winner = evaluateBoardFn(board);
     if (winner === 'O') return 10 - depth;
@@ -59,57 +58,52 @@ function minimax(board, depth, alpha, beta, isMaximizing, evaluateBoardFn) {
 
     if (isMaximizing) {
         let maxEval = -Infinity;
-        for (let i = 0; i < 9; i++) {
-            if (board[i] === '') {
-                board[i] = 'O';
-                let score = minimax(board, depth + 1, alpha, beta, false, evaluateBoardFn);
-                board[i] = '';
-                maxEval = Math.max(maxEval, score);
-                alpha = Math.max(alpha, score);
-                if (beta <= alpha) break;
-            }
+        for (const i of MOVE_ORDER) {
+            if (board[i] !== '') continue;
+            board[i] = 'O';
+            const score = minimax(board, depth + 1, alpha, beta, false, evaluateBoardFn);
+            board[i] = '';
+            if (score > maxEval) maxEval = score;
+            if (score > alpha) alpha = score;
+            if (beta <= alpha) break;
         }
         return maxEval;
-    } else {
-        let minEval = Infinity;
-        for (let i = 0; i < 9; i++) {
-            if (board[i] === '') {
-                board[i] = 'X';
-                let score = minimax(board, depth + 1, alpha, beta, true, evaluateBoardFn);
-                board[i] = '';
-                minEval = Math.min(minEval, score);
-                beta = Math.min(beta, score);
-                if (beta <= alpha) break;
-            }
-        }
-        return minEval;
     }
+
+    let minEval = Infinity;
+    for (const i of MOVE_ORDER) {
+        if (board[i] !== '') continue;
+        board[i] = 'X';
+        const score = minimax(board, depth + 1, alpha, beta, true, evaluateBoardFn);
+        board[i] = '';
+        if (score < minEval) minEval = score;
+        if (score < beta) beta = score;
+        if (beta <= alpha) break;
+    }
+    return minEval;
 }
 
 function findBestMove(board, evaluateBoardFn) {
-    // First-move optimization to avoid evaluating 300k+ nodes
-    let emptyCount = 0;
-    for (let i = 0; i < 9; i++) {
-        if (board[i] === '') emptyCount++;
+    // Empty board: any corner or the center is optimal; pick one at random.
+    if (board.every(cell => cell === '')) {
+        const optimal = [0, 2, 4, 6, 8];
+        return optimal[Math.floor(Math.random() * optimal.length)];
     }
-    
-    if (emptyCount === 9) {
-        // Optimal first moves for empty board are corners or center
-        const optimalFirstMoves = [0, 2, 4, 6, 8];
-        return optimalFirstMoves[Math.floor(Math.random() * optimalFirstMoves.length)];
-    }
+
+    // Skip the search entirely when the game is already decided this turn.
+    const immediate = findImmediateResponse(board, evaluateBoardFn);
+    if (immediate !== -1) return immediate;
 
     let bestScore = -Infinity;
     let bestMove = -1;
-    for (let i = 0; i < 9; i++) {
-        if (board[i] === '') {
-            board[i] = 'O';
-            let score = minimax(board, 0, -Infinity, Infinity, false, evaluateBoardFn);
-            board[i] = '';
-            if (score > bestScore) {
-                bestScore = score;
-                bestMove = i;
-            }
+    for (const i of MOVE_ORDER) {
+        if (board[i] !== '') continue;
+        board[i] = 'O';
+        const score = minimax(board, 0, -Infinity, Infinity, false, evaluateBoardFn);
+        board[i] = '';
+        if (score > bestScore) {
+            bestScore = score;
+            bestMove = i;
         }
     }
     return bestMove;
