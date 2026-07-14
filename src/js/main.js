@@ -76,7 +76,6 @@ function bindEvents() {
         });
 
         cell.addEventListener('click', () => {
-            AudioSynth.init();
             if (game.boardState[index] !== '' || !game.gameActive) {
                 if (game.boardState[index] !== '') {
                     cell.classList.add('shake-animation');
@@ -229,19 +228,24 @@ function executeMove(index) {
     game.currentPlayer = game.currentPlayer === 'X' ? 'O' : 'X';
     ui.updateStatusBubble();
 
-    if (game.gameMode === 'pve' && game.currentPlayer === 'O' && game.gameActive) {
-        game.isAITyping = true;
-        ui.updateStatusBubble();
-        
-        game.aiTimeoutId = setTimeout(() => {
-            if (!game.gameActive || game.gameMode !== 'pve') return;
-            const evalFn = (b) => game.evaluateBoard(b);
-            const aiMove = getAIMove(game.boardState, game.difficulty, evalFn);
-            game.isAITyping = false;
-            game.aiTimeoutId = null;
-            executeMove(aiMove);
-        }, 650);
-    }
+    scheduleAIMove(650);
+}
+
+// Schedule the AI's response after a short "thinking" delay. `delay` is larger
+// on round start so the opening move doesn't feel rushed.
+function scheduleAIMove(delay) {
+    if (game.gameMode !== 'pve' || game.currentPlayer !== 'O' || !game.gameActive) return;
+
+    game.isAITyping = true;
+    ui.updateStatusBubble();
+
+    game.aiTimeoutId = setTimeout(() => {
+        if (!game.gameActive || game.gameMode !== 'pve') return;
+        const aiMove = getAIMove(game.boardState, game.difficulty, (b) => game.evaluateBoard(b));
+        game.isAITyping = false;
+        game.aiTimeoutId = null;
+        executeMove(aiMove);
+    }, delay);
 }
 
 function resetRound(forceX = false) {
@@ -249,18 +253,7 @@ function resetRound(forceX = false) {
     ui.resetBoardUI();
     AudioSynth.play('reset');
 
-    if (game.gameMode === 'pve' && game.currentPlayer === 'O' && game.gameActive) {
-        game.isAITyping = true;
-        ui.updateStatusBubble();
-        game.aiTimeoutId = setTimeout(() => {
-            if (!game.gameActive || game.gameMode !== 'pve') return;
-            const evalFn = (b) => game.evaluateBoard(b);
-            const aiMove = getAIMove(game.boardState, game.difficulty, evalFn);
-            game.isAITyping = false;
-            game.aiTimeoutId = null;
-            executeMove(aiMove);
-        }, 700);
-    }
+    scheduleAIMove(700);
 }
 
 function createRipple(event) {
